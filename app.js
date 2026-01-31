@@ -603,6 +603,7 @@ async function renderData(){
         el("div",{class:"actions"},[
           el("button",{class:"btn primary", id:"btn-import", onClick: async ()=>{
             const input = $("#csvfile");
+            $("#import-status").textContent = `DEBUG: files=${input?.files?.length||0} value=${input?.value||"(empty)"}`;
             const f = input?.files?.[0];
             if(!f){
               $("#import-status").textContent = "No file selected. Tap the file picker first.";
