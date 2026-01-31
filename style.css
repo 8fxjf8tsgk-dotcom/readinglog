@@ -1,0 +1,149 @@
+/* Reading Log PWA - simple, accessible, VoiceOver-friendly */
+:root{
+  --bg:#0b1020;
+  --panel:#111827;
+  --panel2:#0f172a;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --border:#243043;
+  --accent:#60a5fa;
+  --danger:#ef4444;
+  --ok:#22c55e;
+  --shadow: 0 6px 24px rgba(0,0,0,.25);
+  --radius:14px;
+  --pad:14px;
+  --max:980px;
+  font-synthesis-weight:none;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  background: radial-gradient(1200px 800px at 20% 0%, #111a35 0%, var(--bg) 50%, #070a14 100%);
+  color:var(--text);
+}
+
+.topbar{
+  position:sticky; top:0; z-index:10;
+  display:flex; gap:12px; align-items:center; justify-content:space-between;
+  padding:10px 14px;
+  background:rgba(17,24,39,.88);
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--border);
+}
+
+.brand-title{font-weight:700; letter-spacing:.2px}
+.brand-sub{font-size:12px; color:var(--muted); margin-top:2px}
+
+.tabs{display:flex; gap:6px; flex-wrap:wrap}
+.tab{
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--text);
+  padding:8px 10px;
+  border-radius:999px;
+  font-size:14px;
+}
+.tab[aria-current="page"]{
+  border-color:rgba(96,165,250,.7);
+  box-shadow:0 0 0 2px rgba(96,165,250,.15) inset;
+}
+
+main{
+  max-width:var(--max);
+  margin:0 auto;
+  padding:16px;
+}
+
+.section{
+  background:rgba(17,24,39,.78);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:var(--pad);
+  margin:12px 0;
+}
+
+.hrow{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap}
+.hrow h1, .hrow h2{margin:0}
+h1{font-size:20px}
+h2{font-size:16px; color:var(--text)}
+.small{font-size:12px; color:var(--muted)}
+.row{
+  display:flex; flex-direction:column; gap:4px;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:rgba(15,23,42,.55);
+}
+.row:focus-within{outline:2px solid rgba(96,165,250,.45)}
+.title{font-weight:700}
+.meta{font-size:13px; color:var(--muted)}
+.actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+
+.btn{
+  border:1px solid var(--border);
+  background:rgba(15,23,42,.8);
+  color:var(--text);
+  padding:10px 12px;
+  border-radius:12px;
+  font-size:14px;
+}
+.btn.primary{border-color:rgba(96,165,250,.7)}
+.btn.danger{border-color:rgba(239,68,68,.7)}
+.btn.ok{border-color:rgba(34,197,94,.7)}
+.btn:disabled{opacity:.5}
+
+.input, select, textarea{
+  width:100%;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:rgba(3,7,18,.4);
+  color:var(--text);
+  font-size:14px;
+}
+label{display:block; font-size:13px; color:var(--muted); margin:10px 0 6px}
+.grid{
+  display:grid; grid-template-columns:1fr; gap:10px;
+}
+@media(min-width:820px){ .grid.two{grid-template-columns:1fr 1fr} .grid.three{grid-template-columns:1fr 1fr 1fr} }
+
+.kpi{display:grid; grid-template-columns:1fr; gap:10px}
+@media(min-width:820px){ .kpi{grid-template-columns:repeat(5,1fr)} }
+.kcard{padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:rgba(15,23,42,.55)}
+.klabel{font-size:12px; color:var(--muted)}
+.kvalue{font-size:16px; font-weight:700; margin-top:4px}
+.kvalue.ok{color:var(--ok)} .kvalue.bad{color:var(--danger)}
+
+.hr{height:1px; background:var(--border); margin:10px 0}
+
+.toast{
+  position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
+  background:rgba(17,24,39,.95);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:10px 12px;
+  border-radius:999px;
+  max-width:min(92vw,720px);
+  display:none;
+}
+
+.rangeRow{
+  display:grid; grid-template-columns:1fr 1fr auto; gap:8px; align-items:center;
+  padding:8px; border:1px solid var(--border); border-radius:12px; background:rgba(15,23,42,.4);
+}
+.rangeRow button{padding:8px 10px; border-radius:10px}
+
+.badge{
+  display:inline-flex; gap:6px; align-items:center;
+  padding:4px 10px; border-radius:999px; border:1px solid var(--border);
+  font-size:12px; color:var(--muted);
+}
+
+
+.status{margin-top:8px;font-size:13px;opacity:.9;word-break:break-word;}
+
+input[type=file], #btn-pick, #btn-import { position: relative; z-index: 5; pointer-events: auto; }
