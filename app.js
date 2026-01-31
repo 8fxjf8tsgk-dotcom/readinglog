@@ -560,22 +560,77 @@ async function renderData(){
     el("div",{class:"grid two"},[
       el("div",{},[
         el("h2",{},["Import CSV"]),
-        el("div",{class:"small"},["Must be your 22-column schema/order."]),
+        el("div",{class:"small"},["Must be your 22-column schema/order. After you pick a file, you should see its name below."]),
         el("input",{class:"input", id:"csvfile", type:"file", accept:".csv,text/csv"}),
+        el("div",{id:"import-filename", class:"small"},["No file selected."]),
         el("div",{class:"actions"},[
-          el("button",{class:"btn primary", onClick: async ()=>{
-            const f = $("#csvfile").files?.[0];
-            if(!f){ toast("Pick a CSV file first."); return; }
-            const text = await f.text();
+          el("button",{class:"btn", onClick: async ()=>{
+            // Self-test: import a tiny valid CSV with one row, so you can verify the importer is running.
+            const header = CSV_COLUMNS.map(csvEscape).join(",");
+            const rowObj = {};
+            for(const k of CSV_COLUMNS) rowObj[k] = "";
+            rowObj.SchemaVersion = SCHEMA_VERSION;
+            rowObj.Title = "IMPORT SELF-TEST";
+            rowObj.Author = "System";
+            rowObj.AuthorID = "system";
+            rowObj.BookID = "import_self_test";
+            rowObj.Format = "Kindle";
+            rowObj.Duration_h = "1.0000";
+            rowObj.Cost_h = "0";
+            rowObj.Net_h = "1";
+            rowObj.Status = "Finished";
+            rowObj.DateStarted = todayISO();
+            rowObj.DateFinished = todayISO();
+            rowObj.LastEdited = todayISO();
+            rowObj.CompositeKey = "import_self_test";
+            const row = CSV_COLUMNS.map(k=>csvEscape(rowObj[k] ?? "")).join(",");
+            const csv = header + "
+" + row + "
+";
+            $("#import-status").textContent = "Running self-test import…";
             try{
-              const res = await importCSV(text);
-              toast(`Imported ${res.added} rows (${res.deduped} deduped).`);
+              const res = await importCSV(csv);
+              $("#import-status").textContent = `Self-test OK. Imported ${res.added} row(s), deduped ${res.deduped}.`;
+              toast("Self-test import OK.");
               state.query="";
               render();
             }catch(err){
+              $("#import-status").textContent = `Self-test FAILED: ${err.message||String(err)}`;
               alert(err.message||String(err));
             }
+          }},["Run import self-test"])
+        ]),
+        el("div",{class:"actions"},[
+          el("button",{class:"btn primary", id:"btn-import", onClick: async ()=>{
+            const input = $("#csvfile");
+            const f = input?.files?.[0];
+            if(!f){
+              $("#import-status").textContent = "No file selected. Tap the file picker first.";
+              toast("Pick a CSV file first.");
+              return;
+            }
+            const btn = $("#btn-import");
+            btn.disabled = true;
+            $("#import-status").textContent = `Reading file: ${f.name} (${Math.round(f.size/1024)} KB)…`;
+            try{
+              const text = await f.text();
+              $("#import-status").textContent = "Parsing CSV header…";
+              const res = await importCSV(text);
+              $("#import-status").textContent = `Imported ${res.added} rows (${res.deduped} deduped).`;
+              toast(`Imported ${res.added} rows.`);
+              state.query="";
+              render();
+            }catch(err){
+              $("#import-status").textContent = `IMPORT ERROR: ${err.message||String(err)}`;
+              alert(err.message||String(err));
+            }finally{
+              btn.disabled = false;
+            }
           }},["Import"])
+        ]),
+        el("div",{class:"row"},[
+          el("div",{class:"title"},["Import status"]),
+          el("div",{id:"import-status", class:"meta", style:"white-space:pre-wrap"},["Idle."])
         ])
       ]),
       el("div",{},[
@@ -601,6 +656,18 @@ async function renderData(){
       ])
     ])
   ]));
+
+  // Update filename label when a file is picked
+  setTimeout(()=>{
+    const input = $("#csvfile");
+    if(input){
+      input.addEventListener("change", ()=>{
+        const f = input.files?.[0];
+        $("#import-filename").textContent = f ? `Selected: ${f.name} (${Math.round(f.size/1024)} KB)` : "No file selected.";
+      });
+    }
+  }, 0);
+
   return root;
 }
 
